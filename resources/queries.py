@@ -11,8 +11,9 @@ class Get():
     def codigoChip():
         cursor = conn.cursor()
         """ GUARDAR CODIGOS CHIP EN ARRAY """
-        cursor.execute(
-            "SELECT codigo_chip, entidad FROM entidades where departamento in(select distinct(Departamento) from entidades where id_entidad = (select fk_entidad from empresa where estado=1 ));")
+        """ cursor.execute(
+            "SELECT codigo_chip, entidad FROM entidades where departamento in(select distinct(Departamento) from entidades where id_entidad = (select fk_entidad from empresa where estado=1 ));") """
+        cursor.execute("SELECT codigo_chip, entidad FROM entidades where estado = 1;")
         print('\n CODIGOS CHIP\n ---------------')
         for row in cursor:
             print(' Codigo = ', row.codigo_chip, ' Entidad = ', row.entidad)
@@ -27,7 +28,7 @@ class Get():
         cursor.execute("SELECT * FROM reportes_chip WHERE estado =1")
         print(' CODIGOS REPORTE\n ---------------')
         for row in cursor:
-            print(' Nombre = ', row.nombre)
+            print(' Nombre = ', row.nombre + '\t Valor = ', row.codigo_chip_reporte)
             codigos_reporte.append(row)
         print('\n\n')
         cursor.close()
@@ -61,7 +62,7 @@ class Get():
             print(' PERIODO\n ---------------\n',periodos[0]["name"])
 
 
-        print('\n\n------------------------------------------------------------\n')
+        print('\n\n--------------------------------------------------\n')
         cursor.close()
         return periodos
 

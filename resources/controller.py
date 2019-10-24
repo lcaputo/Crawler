@@ -1,4 +1,4 @@
-import time
+import os, time
 import requests
 import platform
 from selenium import webdriver
@@ -8,19 +8,25 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 
 _URL = 'https://www.chip.gov.co/schip_rt/index.jsf'
+userPath = os.environ['USERPROFILE']
+downloadPath = r''+userPath+'\Desktop\\REPORTES CHIP'
 
 class Page():
     def conn():
+
         chromeDriver = ChromeDriverManager().install()
+
         """ CONFIG WEBDRIVER OPTIONS """
-        option = webdriver.ChromeOptions()
-        chrome_prefs = {}
-        option.experimental_options["prefs"] = chrome_prefs
-        option.add_argument("--disable-infobars")
-        chrome_prefs["profile.default_content_settings"] = {"notifications": 1}
-        chrome_prefs["profile.default_content_settings"] = {"images": 2}
-        chrome_prefs["profile.managed_default_content_settings"] = {"images": 2}
-        driver = webdriver.Chrome(executable_path=chromeDriver, chrome_options=option)
+        options = webdriver.ChromeOptions()
+
+        prefs = {
+            "download.default_directory": downloadPath,
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True
+        }
+        options.add_experimental_option('prefs', prefs)
+
+        driver = webdriver.Chrome(executable_path=chromeDriver, chrome_options=options)
         driver.get(_URL)
         driver.find_element_by_link_text("Consultas").click()
         driver.find_element_by_link_text("Informe al Ciudadano").click()
@@ -30,6 +36,13 @@ class Page():
     def reload():
         driver.get(_URL)
         driver.find_element_by_link_text("Consultas").click()
+        driver.find_element_by_link_text("Informe al Ciudadano").click()
+        time.sleep(1)
+
+    def consultas():
+        time.sleep(1)
+        driver.find_element_by_link_text("Consultas").click()
+        time.sleep(1)
         driver.find_element_by_link_text("Informe al Ciudadano").click()
         time.sleep(1)
 
@@ -88,7 +101,9 @@ class Category():
 
     def fillCategoryDropDown(value):
         """ FILLING CATEGORIES DROP DOWN BY ENTITY ID """
+        time.sleep(1)
         categoryDropdown = Select(driver.find_element_by_xpath("//select[@id='frm1:SelBoxCategoria']"))
+        time.sleep(1)
         categoryDropdown.select_by_value(value)
         return True
 
@@ -135,11 +150,12 @@ class Form():
         formDropdown.select_by_value(value)
         """ CLICK ON SUBMIT BUTTON """
         driver.find_element_by_id("frm1:BtnConsular").click()
-        time.sleep(1)
+        time.sleep(5)
         driver.find_element_by_xpath("//*[@title='Descargar a Excel']").click()
-        time.sleep(1)
+        time.sleep(3)
+        """         time.sleep(1)
         level = Select(driver.find_element_by_xpath("//select[@id='frm1:SelBoxNivel']"))
-        level.select_by_value("11")
+        level.select_by_value("11") """
         return True
 
 
