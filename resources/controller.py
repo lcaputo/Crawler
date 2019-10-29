@@ -8,8 +8,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 
 _URL = 'https://www.chip.gov.co/schip_rt/index.jsf'
-userPath = os.environ['USERPROFILE']
-downloadPath = r''+userPath+'\Desktop\\REPORTES CHIP'
+downloadFolder = r''+os.getcwd()+'\CHIP_REPORTES\\'
+oldItemsInFolder = []
+itemsInFolder = []
+excelDocs = []
 
 class Page():
     def conn():
@@ -18,11 +20,19 @@ class Page():
 
         """ CONFIG WEBDRIVER OPTIONS """
         options = webdriver.ChromeOptions()
-
+        options.add_argument("--disable-infobars")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--no-referrers")
+        # OCULTAR NAVEGADOR
+        # options.add_argument("--headless")
         prefs = {
-            "download.default_directory": downloadPath,
+            "download.default_directory": downloadFolder,
             "download.prompt_for_download": False,
-            "download.directory_upgrade": True
+            "download.directory_upgrade": True,
+            "profile.default_content_settings" : 2,
+            "profile.default_content_settings.popups": 0,
+            "profile.default_content_settings.notifications": 1,
+            "profile.managed_default_content_settings.images": 2,
         }
         options.add_experimental_option('prefs', prefs)
 
@@ -150,14 +160,60 @@ class Form():
         formDropdown.select_by_value(value)
         """ CLICK ON SUBMIT BUTTON """
         driver.find_element_by_id("frm1:BtnConsular").click()
-        time.sleep(5)
-        driver.find_element_by_xpath("//*[@title='Descargar a Excel']").click()
         time.sleep(3)
-        """         time.sleep(1)
+        driver.find_element_by_xpath("//*[@title='Descargar a Excel']").click()
+        time.sleep(2)
+        """ time.sleep(1)
         level = Select(driver.find_element_by_xpath("//select[@id='frm1:SelBoxNivel']"))
         level.select_by_value("11") """
         return True
 
+class Download():
+    def convertSet(set):
+        return [*set, ]
+
+    def saveDirectoryItems():
+        oldItemsInFolder.clear()
+        itemsInFolder.clear()
+        excelDocs.clear()
+        fileNames = os.listdir(downloadFolder)
+        for fileName in fileNames:
+            oldItemsInFolder.append(fileName)
+
+    def createFolder(folderName=""):
+        if not (folderName in oldItemsInFolder):
+            os.system('mkdir ' + downloadFolder + folderName)
+
+    def knowNewItems():
+        fileNames = os.listdir(downloadFolder)
+        for fileName in fileNames:
+            itemsInFolder.append(fileName)
+        newItem = set(itemsInFolder) - set(oldItemsInFolder)
+        print(len(newItem))
+        if (len(newItem) != 0):
+            items = Download.convertSet(newItem)
+            print('New Items: ', len(items))
+            for i in range(0, len(items)):
+                downloadedFileName = os.path.splitext(items[i])[0]
+                extension = os.path.splitext(items[i])[1]
+                if (len(downloadedFileName) > 30 and extension == '.xls'):
+                    excelDocs.append(items[i])
+            print('excel docs = ', excelDocs[0])
+
+    def renameDoc(newFileName):
+        os.rename(downloadFolder+'\\'+excelDocs[0], downloadFolder+newFileName+'.xls')
+
+    def compareExcelDocs(docName, entidad=""):
+        os.system("cd " + downloadFolder)
+        df1 = pd.read_excel(excelDocs[0])
+        df2 = pd.read_excel(str(docName2) + '.xls')
+        print(df1.equals(df2))
+
+    def deleteExcel():
+        os.remove(excelDocs[0])
+
+    def deleteReport(route):
+        os.remove(route)
 
 '''
 class main():

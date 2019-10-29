@@ -1,5 +1,5 @@
 from resources import queries, controller
-import time, json
+import os,sys,time,json
 
 """ VARIABLES """
 entidades = queries.Get.codigoChip()
@@ -16,17 +16,18 @@ class main():
         '\nEl periodo actual no ha sido elaborado \nÚltima actulización : ', ultimoPeriodo,'\n---------------------------------\n')
 
 
-    for a in range( 0, len(arregloPeriodos) ):
+    for a in range(0, len(arregloPeriodos)):
         for i in range(0, len(entidades)):
             while True:
-                if (r >= len(codigos_reporte)):
+                if (r == len(codigos_reporte)):
                     r = 0
                     break
                 time.sleep(2)
                 controller.Entity.fillEntityInput(entidades[i].codigo_chip)
                 """ for r in range(0, len(codigos_reporte)): """
-                
-                time.sleep(2)
+                time.sleep(1)
+                controller.Category.fillCategoryDropDown('0')
+                time.sleep(1)
                 controller.Category.fillCategoryDropDown(codigos_reporte[r].codigo_chip_reporte)
                 time.sleep(3)
                 periodos = controller.Period.getPeriods()
@@ -65,11 +66,30 @@ class main():
                                 """  * ACTUALIZAR ALERTA *  CON ESTADO 0  * AL DIA! *  """
                                 queries.Update.entidad(arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], 0,entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte)
                                 print(' >', entidades[i].entidad.upper(), '\n', codigos_reporte[r].nombre, '\n',periodo['name'], ' Al Dia! \n---------------------------------\n')
-                                """ * DESCARGAR DOCUMENTO EXCEL * """
-                                controller.Form.fillFormDropDown(formularios[1]['value'])
-                                """  * IR A CONSULTAS * """
-                                time.sleep(2)
-                                controller.Page.consultas()
+                                if len(sys.argv) == 2 and sys.argv[1] == 'download':
+                                    # SAVE ITEMS_NAME IN DIR
+                                    controller.Download.saveDirectoryItems()
+                                    # CREAR CARPETA CON EL NOMBRE DE LA ENTIDAD
+                                    controller.Download.createFolder(str(entidades[i].codigo_chip))
+                                    # CREAR CARPETA DE NOMBRE EL TIPO DE REPORTE
+                                    controller.Download.createFolder(str(entidades[i].codigo_chip)+'\\'+codigos_reporte[r].codigo_chip_reporte)
+                                    """ * DESCARGAR DOCUMENTO EXCEL * """
+                                    controller.Form.fillFormDropDown(formularios[1]['value'])
+                                    # VERIFICAR SI HAY DOCUMENTOS NUEVOS EN LA CARPETA 'CHIP_REPORTES'
+                                    controller.Download.knowNewItems()
+                                    # MOVE AND RENAME | RENOMBRAR DOCUMENTO CON EL NOMBRE DE LA ENTIDAD Y REPORTE - MOVER A LA CARPETA DE SU ENTIDAD
+                                    # FIXME: VERIFICAR VALIDACIONES SI EXISTE EL ARCHIVO REEMPLAZARLO O BORRAR LA DESCARGA O NO HACER NADA
+                                    if(os.path.isfile('CHIP_REPORTES\\'+str(entidades[i].codigo_chip)+'\\'+codigos_reporte[r].codigo_chip_reporte+'\\'+str(arregloPeriodos[a]['ano'])+'_'+arregloPeriodos[a]['mes'])):
+                                        if (controller.Download.compareExcelDocs('CHIP_REPORTES\\'+str(entidades[i].codigo_chip)+'\\'+codigos_reporte[r].codigo_chip_reporte+'\\'+str(arregloPeriodos[a]['ano'])+'_'+arregloPeriodos[a]['mes'])):
+                                            controller.Download.deleteExcel()
+                                        else:
+                                            controller.Download.deleteReport('CHIP_REPORTES\\'+str(entidades[i].codigo_chip)+'\\'+codigos_reporte[r].codigo_chip_reporte+'\\'+str(arregloPeriodos[a]['ano'])+'_'+arregloPeriodos[a]['mes'])
+                                            controller.Download.renameDoc(str(entidades[i].codigo_chip)+'\\'+codigos_reporte[r].codigo_chip_reporte+'\\'+str(arregloPeriodos[a]['ano'])+'_'+arregloPeriodos[a]['mes'])
+                                    else:
+                                        controller.Download.renameDoc(str(entidades[i].codigo_chip)+'\\'+codigos_reporte[r].codigo_chip_reporte+'\\'+str(arregloPeriodos[a]['ano'])+'_'+arregloPeriodos[a]['mes'])
+                                    """  * IR A CONSULTAS * """
+                                    time.sleep(2)
+                                    controller.Page.consultas()
                                 break
                         else:
                             """  * ¡NO! HAY FORMULARIO EXCEL | ESTADO 1  * ALERTA !!! *  """
