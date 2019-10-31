@@ -22,7 +22,7 @@ class main():
         time.sleep(2)
         controller.Entity.fillEntityInput(entidades[i].codigo_chip)
         for r in range (0, len(codigos_reporte)):
-            time.sleep(1)
+            time.sleep(3)
             controller.Category.fillCategoryDropDown('0')
             time.sleep(1)
             controller.Category.fillCategoryDropDown(codigos_reporte[r].codigo_chip_reporte)
