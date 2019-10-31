@@ -17,25 +17,24 @@ class main():
         '\nEl periodo actual no ha sido elaborado \nÚltima actulización : ', ultimoPeriodo,'\n---------------------------------\n')
 
 
-    for a in range(0, len(arregloPeriodos)):
-        for i in range(0, len(entidades)):
-            while True:
-                if (r == len(codigos_reporte)):
-                    r = 0
-                    break
-                time.sleep(2)
-                controller.Entity.fillEntityInput(entidades[i].codigo_chip)
-                """ for r in range(0, len(codigos_reporte)): """
-                time.sleep(1)
-                controller.Category.fillCategoryDropDown('0')
-                time.sleep(1)
-                controller.Category.fillCategoryDropDown(codigos_reporte[r].codigo_chip_reporte)
-                time.sleep(3)
-                periodos = controller.Period.getPeriods()
-                ultimoPeriodo = periodos[1]['name']
+    for i in range(0, len(entidades)):
+        # CICLO CODIGOS REPORTES : K21, K19, etc
+        for r in range (0, len(codigos_reporte)):
+            time.sleep(2)
+            controller.Entity.fillEntityInput(entidades[i].codigo_chip)
+            """ for r in range(0, len(codigos_reporte)): """
+            time.sleep(1)
+            controller.Category.fillCategoryDropDown('0')
+            time.sleep(1)
+            controller.Category.fillCategoryDropDown(codigos_reporte[r].codigo_chip_reporte)
+            time.sleep(2)
+            periodos = controller.Period.getPeriods()
+            time.sleep(1)
+            ultimoPeriodo = periodos[1]['name']
+            for a in range(0, len(arregloPeriodos)):
                 existe = queries.Get.buscarAlertaPorCodigoChip(entidades[i].codigo_chip,str(codigos_reporte[r].codigo_chip_reporte),arregloPeriodos[a]['ano'], arregloPeriodos[a]['mes'])
                 """ * CICLO WHILE *  PARA RECORRER LOS PERIODOS """
-                while True: 
+                while True:
                     p = p + 1
                     """ CONDICIONAL PARA  * TERMINAR *  EL CICLO """
                     if (p > (len(periodos) - 1)):
@@ -46,19 +45,17 @@ class main():
                     periodo = periodos[p]
                     """ VALIDAR SI ESTÄ LA INFORMACION DEL  * PERIODO ACTUAL *  """
                     if (periodo['value'] == arregloPeriodos[a]['value']):
-                        p = 0
-                        controller.Period.fillPeriodDropDown(periodo['value'])
+                        p = len(periodos)
+                        controller.Period.fillPeriodDropDown(arregloPeriodos[a]['value'])
                         time.sleep(3)
                         formularios = controller.Form.getFormulario()
                         time.sleep(2)
-
                         """  * VERIFICAR *  SI HAY UN  * EXCEL SUBIDO *  A LA PLATAFORMA CHIP """
                         if (len(formularios) > 0):
                             if not existe:
                                 """  * CREAR ALERTA * CON ESTADO 0  * AL DIA! *  """
                                 queries.Set.alerta(entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte,arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], 0)
                                 print(' >', entidades[i].entidad.upper(), '\n', codigos_reporte[r].nombre, '\n',periodo['name'], ' Al Dia! \n---------------------------------\n')
-                                
                                 """ * DESCARGAR DOCUMENTO EXCEL * """
                                 #controller.Form.fillFormDropDown(formularios[1]['value'])
                                 break
@@ -87,19 +84,18 @@ class main():
                                             controller.Download.renameDoc(str(entidades[i].codigo_chip)+'\\'+codigos_reporte[r].codigo_chip_reporte+'\\'+str(arregloPeriodos[a]['ano'])+'_'+arregloPeriodos[a]['mes'])
                                     else:
                                         controller.Download.renameDoc(str(entidades[i].codigo_chip)+'\\'+codigos_reporte[r].codigo_chip_reporte+'\\'+str(arregloPeriodos[a]['ano'])+'_'+arregloPeriodos[a]['mes'])
-                                    """  * IR A CONSULTAS * """
-                                    time.sleep(2)
-                                    controller.Page.consultas()
-                                break
+                                        """  * IR A CONSULTAS * """
+                                        time.sleep(2)
+                                        controller.Page.consultas()
+                                    break
                         else:
                             """  * ¡NO! HAY FORMULARIO EXCEL | ESTADO 1  * ALERTA !!! *  """
                             alerta(existe, i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], ultimoPeriodo)
                             break
+            time.sleep(1)
 
-                time.sleep(1)
-                r = r + 1
-        controller.Page.quit()
-        exit()
+    controller.Page.quit()
+    exit()
 
 
 
