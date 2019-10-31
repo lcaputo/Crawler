@@ -19,10 +19,9 @@ class main():
 
     for i in range(0, len(entidades)):
         # CICLO CODIGOS REPORTES : K21, K19, etc
+        time.sleep(2)
+        controller.Entity.fillEntityInput(entidades[i].codigo_chip)
         for r in range (0, len(codigos_reporte)):
-            time.sleep(2)
-            controller.Entity.fillEntityInput(entidades[i].codigo_chip)
-            """ for r in range(0, len(codigos_reporte)): """
             time.sleep(1)
             controller.Category.fillCategoryDropDown('0')
             time.sleep(1)
@@ -34,18 +33,10 @@ class main():
             for a in range(0, len(arregloPeriodos)):
                 existe = queries.Get.buscarAlertaPorCodigoChip(entidades[i].codigo_chip,str(codigos_reporte[r].codigo_chip_reporte),arregloPeriodos[a]['ano'], arregloPeriodos[a]['mes'])
                 """ * CICLO WHILE *  PARA RECORRER LOS PERIODOS """
-                while True:
-                    p = p + 1
-                    """ CONDICIONAL PARA  * TERMINAR *  EL CICLO """
-                    if (p > (len(periodos) - 1)):
-                        """ NO SE HA ENCONTRADO EL PERIODO ESPECIFICADO  * ALERTA! *  """
-                        p = 0
-                        alerta(existe, i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], ultimoPeriodo)
-                        break
+                for p in range(1, (len(periodos)-1)):
                     periodo = periodos[p]
                     """ VALIDAR SI ESTÄ LA INFORMACION DEL  * PERIODO ACTUAL *  """
                     if (periodo['value'] == arregloPeriodos[a]['value']):
-                        p = len(periodos)
                         controller.Period.fillPeriodDropDown(arregloPeriodos[a]['value'])
                         time.sleep(3)
                         formularios = controller.Form.getFormulario()
@@ -87,12 +78,12 @@ class main():
                                         """  * IR A CONSULTAS * """
                                         time.sleep(2)
                                         controller.Page.consultas()
-                                    break
+                                        break
+
                         else:
                             """  * ¡NO! HAY FORMULARIO EXCEL | ESTADO 1  * ALERTA !!! *  """
                             alerta(existe, i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], ultimoPeriodo)
                             break
-            time.sleep(1)
 
     controller.Page.quit()
     exit()
