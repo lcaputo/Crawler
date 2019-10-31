@@ -6,6 +6,7 @@ conn = connection()
 codigos_chip = []
 codigos_reporte = []
 periodo = ''
+match = []
 
 class Get():
     def codigoChip():
@@ -68,13 +69,18 @@ class Get():
 
     def buscarAlertaPorCodigoChip(chip,reporte,ano,mes):
         cursor = conn.cursor()
-        matches = []
+
         """ BUSCAR ALERTAS POR CODIGO CHIP """
         cursor.execute("SELECT * FROM alertas_reportes WHERE codigo_chip = %s and codigo_chip_reporte = '%s' and periodo_anno = %s and periodo_meses = '%s'" % (chip,reporte,ano,mes))
         for row in cursor:
-           matches.append(row)
+           match.append(row)
         cursor.close()
-        return matches
+        if len(match) > 0:
+            match.clear()
+            return True
+        else:
+            match.clear()
+            return False
 
 class Set():
     def alerta(cc,codigo_chip_reporte,periodo_anno,periodo_meses,estado):
@@ -85,10 +91,10 @@ class Set():
         cursor.close()
 
 class Update():
-    def entidad(periodo_anno,periodo_meses,estado,cc,codigo_chip_reporte):
+    def entidad(estado,cc,codigo_chip_reporte,periodo_anno,periodo_meses):
         cursor = conn.cursor()
         """ LLENAR TABLA ALERTAS_REPORTES """
-        cursor.execute("UPDATE alertas_reportes SET periodo_anno = %s ,periodo_meses = '%s' ,estado = %s where codigo_chip = %s and codigo_chip_reporte = '%s'" % (periodo_anno,periodo_meses,estado,cc,codigo_chip_reporte))
+        cursor.execute("UPDATE alertas_reportes SET estado = %s where codigo_chip = %s and codigo_chip_reporte = '%s' and periodo_anno = %s and periodo_meses = %s " % (estado,cc,codigo_chip_reporte,periodo_anno,periodo_meses))
         conn.commit()
         cursor.close()
 

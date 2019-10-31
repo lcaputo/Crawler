@@ -10,8 +10,9 @@ r = 0
 
 class main():
     """  * ALERTA *  PARA ENTIDADES DESACTUALIZADAS """
-    def alerta(i,r, ano, mes, ultimoPeriodo):
-        queries.Set.alerta(entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte, ano, mes, 1)
+    def alerta(existe,i, r, ano, mes, ultimoPeriodo):
+        if not existe:
+            queries.Set.alerta(entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte, ano, mes, 1)
         return print('Alerta ', entidades[i].entidad.upper(), ' - ', codigos_reporte[r].nombre,
         '\nEl periodo actual no ha sido elaborado \nÚltima actulización : ', ultimoPeriodo,'\n---------------------------------\n')
 
@@ -32,7 +33,7 @@ class main():
                 time.sleep(3)
                 periodos = controller.Period.getPeriods()
                 ultimoPeriodo = periodos[1]['name']
-
+                existe = queries.Get.buscarAlertaPorCodigoChip(entidades[i].codigo_chip,str(codigos_reporte[r].codigo_chip_reporte),arregloPeriodos[a]['ano'], arregloPeriodos[a]['mes'])
                 """ * CICLO WHILE *  PARA RECORRER LOS PERIODOS """
                 while True: 
                     p = p + 1
@@ -40,7 +41,7 @@ class main():
                     if (p > (len(periodos) - 1)):
                         """ NO SE HA ENCONTRADO EL PERIODO ESPECIFICADO  * ALERTA! *  """
                         p = 0
-                        alerta(i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], ultimoPeriodo)
+                        alerta(existe, i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], ultimoPeriodo)
                         break
                     periodo = periodos[p]
                     """ VALIDAR SI ESTÄ LA INFORMACION DEL  * PERIODO ACTUAL *  """
@@ -50,21 +51,20 @@ class main():
                         time.sleep(3)
                         formularios = controller.Form.getFormulario()
                         time.sleep(2)
-                        existe = queries.Get.buscarAlertaPorCodigoChip(entidades[i].codigo_chip,str(codigos_reporte[r].codigo_chip_reporte),arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'])
+
                         """  * VERIFICAR *  SI HAY UN  * EXCEL SUBIDO *  A LA PLATAFORMA CHIP """
                         if (len(formularios) > 0):
-                            if (len(existe) == 0):
+                            if not existe:
                                 """  * CREAR ALERTA * CON ESTADO 0  * AL DIA! *  """
-                                queries.Set.alerta(entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte,
-                                arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], 0)
+                                queries.Set.alerta(entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte,arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], 0)
                                 print(' >', entidades[i].entidad.upper(), '\n', codigos_reporte[r].nombre, '\n',periodo['name'], ' Al Dia! \n---------------------------------\n')
                                 
                                 """ * DESCARGAR DOCUMENTO EXCEL * """
-                                controller.Form.fillFormDropDown(formularios[1]['value'])
+                                #controller.Form.fillFormDropDown(formularios[1]['value'])
                                 break
                             else:
                                 """  * ACTUALIZAR ALERTA *  CON ESTADO 0  * AL DIA! *  """
-                                queries.Update.entidad(arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], 0,entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte)
+                                queries.Update.entidad(0,entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte,arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'])
                                 print(' >', entidades[i].entidad.upper(), '\n', codigos_reporte[r].nombre, '\n',periodo['name'], ' Al Dia! \n---------------------------------\n')
                                 if len(sys.argv) == 2 and sys.argv[1] == 'download':
                                     # SAVE ITEMS_NAME IN DIR
@@ -93,7 +93,7 @@ class main():
                                 break
                         else:
                             """  * ¡NO! HAY FORMULARIO EXCEL | ESTADO 1  * ALERTA !!! *  """
-                            alerta(i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], ultimoPeriodo)
+                            alerta(existe, i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], ultimoPeriodo)
                             break
 
                 time.sleep(1)
