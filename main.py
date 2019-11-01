@@ -10,11 +10,11 @@ r = 0
 
 class main():
     """  * ALERTA *  PARA ENTIDADES DESACTUALIZADAS """
-    def alerta(existe,i, r, ano, mes, ultimoPeriodo):
+    def alerta(existe,i, r, ano, mes):
         if not existe:
             queries.Set.alerta(entidades[i].codigo_chip, codigos_reporte[r].codigo_chip_reporte, ano, mes, 1)
         return print('Alerta ', entidades[i].entidad.upper(), ' - ', codigos_reporte[r].nombre,
-        '\nEl periodo actual no ha sido elaborado \nÚltima actulización : ', ultimoPeriodo,'\n---------------------------------\n')
+        '\nEl periodo actual no ha sido elaborado ','\n---------------------------------\n')
 
 
     for i in range(0, len(entidades)):
@@ -29,8 +29,7 @@ class main():
             time.sleep(2)
             periodos = controller.Period.getPeriods()
             time.sleep(1)
-            ultimoPeriodo = periodos[1]['name']
-            print(ultimoPeriodo)
+
             for a in range(0, len(arregloPeriodos)):
                 existe = queries.Get.buscarAlertaPorCodigoChip(entidades[i].codigo_chip,str(codigos_reporte[r].codigo_chip_reporte),arregloPeriodos[a]['ano'], arregloPeriodos[a]['mes'])
                 """ * CICLO WHILE *  PARA RECORRER LOS PERIODOS """
@@ -83,7 +82,7 @@ class main():
 
                         else:
                             """  * ¡NO! HAY FORMULARIO EXCEL | ESTADO 1  * ALERTA !!! *  """
-                            alerta(existe, i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'], ultimoPeriodo)
+                            alerta(existe, i, r, arregloPeriodos[a]['ano'],arregloPeriodos[a]['mes'])
                             break
 
     controller.Page.quit()
