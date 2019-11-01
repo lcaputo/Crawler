@@ -30,6 +30,7 @@ class main():
             periodos = controller.Period.getPeriods()
             time.sleep(1)
             ultimoPeriodo = periodos[1]['name']
+            print(ultimoPeriodo)
             for a in range(0, len(arregloPeriodos)):
                 existe = queries.Get.buscarAlertaPorCodigoChip(entidades[i].codigo_chip,str(codigos_reporte[r].codigo_chip_reporte),arregloPeriodos[a]['ano'], arregloPeriodos[a]['mes'])
                 """ * CICLO WHILE *  PARA RECORRER LOS PERIODOS """
