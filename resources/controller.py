@@ -33,6 +33,10 @@ class Page():
             "profile.default_content_settings.popups": 0,
             "profile.default_content_settings.notifications": 1,
             "profile.managed_default_content_settings.images": 2,
+            "profile.browser.cache.disk.enable": False,
+            "profile.browser.cache.memory.enable": False,
+            "browser.cache.offline.enable": False,
+            "network.http.use-cache": False
         }
         options.add_experimental_option('prefs', prefs)
 
@@ -44,7 +48,8 @@ class Page():
         return driver
 
     def reload():
-        driver.get(_URL)
+        driver.delete_cookie('JSESSIONID')
+        driver.refresh()
         driver.find_element_by_link_text("Consultas").click()
         driver.find_element_by_link_text("Informe al Ciudadano").click()
         time.sleep(1)
