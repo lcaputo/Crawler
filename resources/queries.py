@@ -96,7 +96,7 @@ class Update():
         """ LLENAR TABLA ALERTAS_REPORTES """
         cursor.execute("UPDATE alertas_reportes SET estado = %s where codigo_chip = %s and codigo_chip_reporte = '%s' and periodo_anno = %s and periodo_meses = %s " % (estado,cc,codigo_chip_reporte,periodo_anno,periodo_meses))
         # TODO: CAMBIAR ESTADO EN LA TABLA ENTIDADES
-        cursor.execute("UPDATE entidades SET estado = %s where ")
+        # cursor.execute("UPDATE entidades SET estado = %s where ")
         conn.commit()
         cursor.close()
 

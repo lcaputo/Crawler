@@ -100,10 +100,14 @@ class Entity():
 class Category():
 
     def getCategories():
+        time.sleep(1)
         categories = []
+        time.sleep(1)
         """ GET ENTITY CATEGORIES """
         dropDown = driver.find_element_by_name("frm1:SelBoxCategoria")
+        time.sleep(1)
         options = dropDown.find_elements_by_tag_name("option")
+        time.sleep(1)
         for elm in options:
             value = elm.get_attribute("value")
             name = elm.get_attribute("innerHTML")
@@ -119,7 +123,10 @@ class Category():
         time.sleep(1)
         categoryDropdown = Select(driver.find_element_by_xpath("//select[@id='frm1:SelBoxCategoria']"))
         time.sleep(1)
-        categoryDropdown.select_by_value(value)
+        try:
+            categoryDropdown.select_by_value(value)
+        except:
+            return False
         return True
 
 
@@ -137,11 +144,16 @@ class Period():
         return periods
 
     def fillPeriodDropDown(value):
+        time.sleep(1)
         """ FILLING CATEGORIES DROP DOWN BY ENTITY ID """
         periodDropdown = Select(driver.find_element_by_xpath("//select[@id='frm1:SelBoxPeriodo']"))
+        time.sleep(1)
         periodDropdown.select_by_value('0')
         time.sleep(2)
-        periodDropdown.select_by_value('1' + value)
+        try:
+            periodDropdown.select_by_value('1' + value)
+        except:
+            return False
         return True
 
 
