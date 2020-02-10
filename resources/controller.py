@@ -121,7 +121,10 @@ class Category():
     def fillCategoryDropDown(value):
         """ FILLING CATEGORIES DROP DOWN BY ENTITY ID """
         time.sleep(1)
-        categoryDropdown = Select(driver.find_element_by_xpath("//select[@id='frm1:SelBoxCategoria']"))
+        try:
+            categoryDropdown = Select(driver.find_element_by_xpath("//select[@id='frm1:SelBoxCategoria']"))
+        except:
+            return False
         time.sleep(1)
         try:
             categoryDropdown.select_by_value(value)
