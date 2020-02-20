@@ -47,20 +47,21 @@ class Page():
         time.sleep(1)
         return driver
 
+    """ REFRESCAR PAGINA PARA NO PERDER SESSION POR EXPIRACIÓN DE LA COOKIE """
     def reload():
         driver.delete_cookie('JSESSIONID')
         driver.refresh()
         driver.find_element_by_link_text("Consultas").click()
         driver.find_element_by_link_text("Informe al Ciudadano").click()
         time.sleep(1)
-
+    """ CLICK AL BOTON DE CONSULTAS """
     def consultas():
         time.sleep(1)
         driver.find_element_by_link_text("Consultas").click()
         time.sleep(1)
         driver.find_element_by_link_text("Informe al Ciudadano").click()
         time.sleep(1)
-
+    """ CERRAR EL NAVEGADOR """
     def quit():
         driver.quit()
 
@@ -71,7 +72,7 @@ driver: webdriver = Page.conn()
 
 class Entity():
     """ FILLING ENTITY INPUT """
-
+    """ RELLENAR CAMPO CON CODIGO CHIP """
     def fillEntityInput(keyword):
         entityInput = driver.find_element_by_xpath("//input[@id='frm1:SelBoxEntidadCiudadano_input']")
         entityInput.clear()
@@ -98,7 +99,7 @@ class Entity():
 
 
 class Category():
-
+    """ GET CODIGOS DE REPORTE """
     def getCategories():
         time.sleep(1)
         categories = []
@@ -117,7 +118,7 @@ class Category():
             }
             categories.append(json)
         return categories
-
+    """ SELECCIONAR CATEGORIA """
     def fillCategoryDropDown(value):
         """ FILLING CATEGORIES DROP DOWN BY ENTITY ID """
         time.sleep(1)
@@ -134,6 +135,7 @@ class Category():
 
 
 class Period():
+    """ OBTENER FECHAS Y PERIODOS """
     def getPeriods():
         periods = []
         """ GET PERIODOS """
@@ -145,7 +147,7 @@ class Period():
             }
             periods.append(json)
         return periods
-
+    """ LLENAR CAMPO DE FECHA Y PERIODO """
     def fillPeriodDropDown(value):
         time.sleep(1)
         """ FILLING CATEGORIES DROP DOWN BY ENTITY ID """

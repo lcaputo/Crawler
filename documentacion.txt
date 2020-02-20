@@ -1,0 +1,11 @@
+#1 si no hay entorno virtual creado 
+> python -m venv .venv
+
+#2 acceder al entorno virtual
+> .venv\Scripts\activate.bat
+
+#3 instalar recursos necesarios
+> pip install -r requirements.txt
+
+# ejecutar aplicación python
+> python main.py
